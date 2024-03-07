@@ -1,5 +1,7 @@
 module;
 #include <cstdint>
+#include <ranges>
+#include <algorithm>
 export module Elf;
 using namespace std;
 
@@ -12,8 +14,9 @@ export
 }
 
 constexpr int EI_NIDENT = 16;
+export constexpr size_t HEADER_SIZE = 52;
 
-class ElfHeader
+export class ElfHeader
 {
 public:
     unsigned char e_ident[EI_NIDENT];
@@ -30,4 +33,13 @@ public:
     Elf32_Half e_shentsize;
     Elf32_Half e_shnum;
     Elf32_Half e_shstrndx;
+
+    ElfHeader(ranges::view auto const &file)
+    {
+        unsigned char word_buf[4]{};
+        unsigned char half_buf[2]{};
+
+        auto [in, out] = ranges::copy_n(file.begin(), 2, e_ident);
+    }
 };
+static_assert(sizeof(ElfHeader) == HEADER_SIZE);

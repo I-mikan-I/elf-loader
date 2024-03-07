@@ -10,11 +10,7 @@ project(
   VERSION 1.0
   LANGUAGES CXX)
 
-add_compile_options(-I/nix/store/0p66fy5qygglhxckxshx15vvh68zm0lv-clang-17.0.6-lib/lib/clang/17/include)
-if(CMAKE_EXPORT_COMPILE_COMMANDS)
-  set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES 
-      ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
-endif()
+add_compile_options(-Wall -fdiagnostics-color=always)
 
 add_library(elf)
 target_sources(elf
