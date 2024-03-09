@@ -3,5 +3,5 @@ import Lib;
 int main(int argc, char const *argv[])
 {
     /* code */
-    return 0;
+    print_elf_header(argv[1]);
 }
