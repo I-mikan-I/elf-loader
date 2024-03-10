@@ -12,6 +12,13 @@ project(
 
 add_compile_options(-Wall -fdiagnostics-color=always)
 
+add_library(util)
+target_sources(util
+  PUBLIC
+    FILE_SET CXX_MODULES FILES
+      src/util/lib.cpp)
+link_libraries(util)
+
 add_library(elf)
 target_sources(elf
   PUBLIC
