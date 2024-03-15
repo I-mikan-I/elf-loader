@@ -23,7 +23,7 @@ add_library(elf)
 target_sources(elf
   PUBLIC
     FILE_SET CXX_MODULES FILES
-      src/elf/lib.cpp)
+      src/elf/lib.cpp src/elf/header.cpp)
 
 add_library(lib)
 target_sources(lib
