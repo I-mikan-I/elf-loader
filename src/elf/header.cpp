@@ -1,28 +1,12 @@
 module;
 #include <cstdint>
-#include <ranges>
 #include <iostream>
 #include <iomanip>
-#include <algorithm>
-#include <utility>
-#include <stdexcept>
 export module Elf:Header;
+import :Util;
 
 namespace elf
 {
-    using Elf32_Half = uint16_t;
-    using Elf32_Word = uint32_t;
-    using Elf32_Addr = uint32_t;
-    using Elf32_Off = uint32_t;
-    using Elf64_Half = uint16_t;
-    using Elf64_Word = uint32_t;
-    using Elf64_Addr = uint64_t;
-    using Elf64_Off = uint64_t;
-    enum Width
-    {
-        X32,
-        X64
-    };
     constexpr int EI_NIDENT = 16;
     template <Width W>
     struct header_t;

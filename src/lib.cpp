@@ -21,4 +21,5 @@ export void print_elf_header(std::filesystem::path elf)
          std::back_inserter(file));
 
     elf::Elf parsed((owning_view<decltype(file)>(std::move(file))));
+    parsed.PrintProgramHeaders();
 }

@@ -2,17 +2,20 @@ module;
 #include <cstdint>
 #include <ranges>
 #include <iostream>
-#include <iomanip>
 #include <algorithm>
 #include <utility>
 #include <stdexcept>
+#include <format>
 export module Elf;
 import :Header;
+import :Util;
+import :Pheader;
 using namespace std;
 
 namespace elf
 {
     export template <ranges::view V>
+        requires ranges::contiguous_range<V>
     class Elf
     {
     public:
@@ -37,6 +40,23 @@ namespace elf
                 Initialize64();
             }
         }
+        void PrintProgramHeaders() const
+        {
+            if (width == X32)
+            {
+                for (auto &h : GetProgramHeaders<X32>())
+                {
+                    std::cout << h;
+                }
+            }
+            else if (width == X64)
+            {
+                for (auto &h : GetProgramHeaders<X64>())
+                {
+                    std::cout << h;
+                }
+            }
+        }
 
     private:
         V file;
@@ -46,6 +66,33 @@ namespace elf
             header_t<X32> x32;
             header_t<X64> x64;
         } header;
+        template <Width W>
+        const header_t<W> &GetHeader() const
+        {
+            if constexpr (W == X32)
+            {
+                return header.x32;
+            }
+            else if constexpr (W == X64)
+            {
+                return header.x64;
+            }
+            else
+            {
+                static_assert(false);
+            }
+        }
+        template <Width W>
+        ranges::view auto GetProgramHeaders() const
+        {
+            const unsigned char *data = ranges::data(file);
+            const ProgramHeader<W> *begin = reinterpret_cast<const ProgramHeader<W> *>(data + GetHeader<W>().e_phoff);
+            if (GetHeader<W>().e_phentsize != sizeof(ProgramHeader<W>))
+            {
+                throw std::invalid_argument(std::format("Unexpected Program Header size: {}", sizeof(ProgramHeader<W>)));
+            }
+            return ranges::subrange(begin, begin + GetHeader<W>().e_phnum);
+        }
         void Initialize32()
         {
             if (ranges::size(file) < header.x32.size)
@@ -54,6 +101,7 @@ namespace elf
             }
             ranges::copy_n(file.begin(), header.x32.size, reinterpret_cast<unsigned char *>(&(this->header.x32)));
             std::cout << header.x32;
+            width = X32;
         }
         void Initialize64()
         {
@@ -63,6 +111,7 @@ namespace elf
             }
             ranges::copy_n(file.begin(), header.x64.size, reinterpret_cast<unsigned char *>(&(this->header.x64)));
             std::cout << header.x64;
+            width = X64;
         }
     };
 
