@@ -10,6 +10,7 @@ export module Elf;
 import :Header;
 import :Util;
 import :Pheader;
+import Util;
 using namespace std;
 
 namespace elf
@@ -40,6 +41,10 @@ namespace elf
                 Initialize64();
             }
         }
+        Elf(Elf &other) = delete;
+        Elf(Elf &&other) = default;
+        Elf &operator=(Elf &other) = delete;
+        Elf &operator=(Elf &&other) = default;
         void PrintProgramHeaders() const
         {
             if (width == X32)
@@ -100,7 +105,7 @@ namespace elf
                 throw std::invalid_argument("File too small");
             }
             ranges::copy_n(file.begin(), header.x32.size, reinterpret_cast<unsigned char *>(&(this->header.x32)));
-            std::cout << header.x32;
+            debug << header.x32;
             width = X32;
         }
         void Initialize64()
@@ -110,7 +115,7 @@ namespace elf
                 throw std::invalid_argument("File too small");
             }
             ranges::copy_n(file.begin(), header.x64.size, reinterpret_cast<unsigned char *>(&(this->header.x64)));
-            std::cout << header.x64;
+            debug << header.x64;
             width = X64;
         }
     };

@@ -35,6 +35,8 @@ namespace elf
     private:
         uint32_t val;
     };
+    static_assert(sizeof(p_type_t) == sizeof(uint32_t));
+    static_assert(alignof(p_type_t) == alignof(uint32_t));
 
     std::ostream &operator<<(std::ostream &os, const p_type_t &p_type)
     {

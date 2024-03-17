@@ -11,6 +11,9 @@ project(
   LANGUAGES CXX)
 
 add_compile_options(-Wall -fdiagnostics-color=always)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_compile_definitions(LOGLEVEL=2)
+endif()
 
 add_library(util)
 target_sources(util
