@@ -13,33 +13,38 @@ using namespace std;
 
 namespace elf
 {
-
+    export template <ranges::view V>
+        requires ranges::contiguous_range<V>
+    class Elf;
     inline auto execution_view_inner(const auto *self, ranges::contiguous_range auto const &file)
     {
         using namespace std::ranges;
         return (file | views::drop(self->p_offset) | views::take(self->p_filesz));
     }
 
-    template <Width W>
+    export template <Width W>
     struct ProgramHeader
     {
     };
 
-    constexpr uint32_t PT_NULL = 0;
-    constexpr uint32_t PT_LOAD = 1;
-    constexpr uint32_t PT_DYNAMIC = 2;
-    constexpr uint32_t PT_INTERP = 3;
-    constexpr uint32_t PT_NOTE = 4;
-    constexpr uint32_t PT_SHLIB = 5;
-    constexpr uint32_t PT_PHDR = 6;
-    constexpr uint32_t PT_TLS = 7;
-    constexpr uint32_t PT_LOOS = 0x60000000;
-    constexpr uint32_t PT_GNU_EH_FRAME = 0x6474e550;
-    constexpr uint32_t PT_GNU_STACK = 0x6474e551;
-    constexpr uint32_t PT_GNU_RELRO = 0x6474e552;
-    constexpr uint32_t PT_HIOS = 0x6fffffff;
-    constexpr uint32_t PT_LOPROC = 0x70000000;
-    constexpr uint32_t PT_HIPROC = 0x7fffffff;
+    export
+    {
+        constexpr uint32_t PT_NULL = 0;
+        constexpr uint32_t PT_LOAD = 1;
+        constexpr uint32_t PT_DYNAMIC = 2;
+        constexpr uint32_t PT_INTERP = 3;
+        constexpr uint32_t PT_NOTE = 4;
+        constexpr uint32_t PT_SHLIB = 5;
+        constexpr uint32_t PT_PHDR = 6;
+        constexpr uint32_t PT_TLS = 7;
+        constexpr uint32_t PT_LOOS = 0x60000000;
+        constexpr uint32_t PT_GNU_EH_FRAME = 0x6474e550;
+        constexpr uint32_t PT_GNU_STACK = 0x6474e551;
+        constexpr uint32_t PT_GNU_RELRO = 0x6474e552;
+        constexpr uint32_t PT_HIOS = 0x6fffffff;
+        constexpr uint32_t PT_LOPROC = 0x70000000;
+        constexpr uint32_t PT_HIPROC = 0x7fffffff;
+    }
 
     struct p_type_t
     {
@@ -91,7 +96,7 @@ namespace elf
         return os << "UNKNOWN: 0x" << hex << val;
     }
 
-    template <>
+    export template <>
     struct ProgramHeader<X32>
     {
         p_type_t p_type;
@@ -107,15 +112,15 @@ namespace elf
                   ranges::view T =
                       decltype(execution_view_inner(
                           std::declval<const ProgramHeader<X32> *>(),
-                          std::declval<const F &>()))>
+                          std::declval<ranges::ref_view<const F> &>()))>
             requires ranges::input_range<T>
-        auto ExecutionView(const F &file) const -> T
+        auto ExecutionView(const Elf<F> &file) const -> T
         {
-            return execution_view_inner(this, file);
+            return execution_view_inner(this, ranges::ref_view(file.file));
         }
     };
 
-    template <>
+    export template <>
     struct ProgramHeader<X64>
     {
         p_type_t p_type;
@@ -131,11 +136,11 @@ namespace elf
                   ranges::view T =
                       decltype(execution_view_inner(
                           std::declval<const ProgramHeader<X64> *>(),
-                          std::declval<const F &>()))>
+                          std::declval<ranges::ref_view<const F> &>()))>
             requires ranges::input_range<T>
-        auto ExecutionView(const F &file) const -> T
+        auto ExecutionView(const Elf<F> &file) const -> T
         {
-            return execution_view_inner(this, file);
+            return execution_view_inner(this, ranges::ref_view(file.file));
         }
     };
 

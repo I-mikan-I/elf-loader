@@ -10,8 +10,8 @@ module;
 #include <vector>
 export module Elf;
 import :Header;
-import :Util;
-import :Pheader;
+export import :Util;
+export import :Pheader;
 import Util;
 using namespace std;
 
@@ -64,15 +64,28 @@ namespace elf
                 }
             }
         }
+        template <Width W>
+        ranges::view auto GetProgramHeaders() const
+        {
+            const unsigned char *data = ranges::data(file);
+            const ProgramHeader<W> *begin = reinterpret_cast<const ProgramHeader<W> *>(data + GetHeader<W>().e_phoff);
+            if (GetHeader<W>().e_phentsize != sizeof(ProgramHeader<W>))
+            {
+                throw std::invalid_argument(std::format("Unexpected Program Header size: {}", sizeof(ProgramHeader<W>)));
+            }
+            return ranges::subrange(begin, begin + GetHeader<W>().e_phnum);
+        }
 
+        Width width;
     private:
         V file;
-        Width width;
         union
         {
             header_t<X32> x32;
             header_t<X64> x64;
         } header;
+        friend ProgramHeader<X32>;
+        friend ProgramHeader<X64>;
         template <Width W>
         const header_t<W> &GetHeader() const
         {
@@ -88,17 +101,6 @@ namespace elf
             {
                 static_assert(false);
             }
-        }
-        template <Width W>
-        ranges::view auto GetProgramHeaders() const
-        {
-            const unsigned char *data = ranges::data(file);
-            const ProgramHeader<W> *begin = reinterpret_cast<const ProgramHeader<W> *>(data + GetHeader<W>().e_phoff);
-            if (GetHeader<W>().e_phentsize != sizeof(ProgramHeader<W>))
-            {
-                throw std::invalid_argument(std::format("Unexpected Program Header size: {}", sizeof(ProgramHeader<W>)));
-            }
-            return ranges::subrange(begin, begin + GetHeader<W>().e_phnum);
         }
         void Initialize32()
         {
