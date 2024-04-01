@@ -2,14 +2,28 @@ module;
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
+#include <ranges>
+#include <algorithm>
+#include <vector>
+#include <type_traits>
 export module Elf:Pheader;
 import :Util;
+import Util;
 using namespace std;
 
 namespace elf
 {
+
+    inline auto execution_view_inner(const auto *self, ranges::contiguous_range auto const &file)
+    {
+        using namespace std::ranges;
+        return (file | views::drop(self->p_offset) | views::take(self->p_filesz));
+    }
+
     template <Width W>
-    struct ProgramHeader;
+    struct ProgramHeader
+    {
+    };
 
     constexpr uint32_t PT_NULL = 0;
     constexpr uint32_t PT_LOAD = 1;
@@ -88,6 +102,17 @@ namespace elf
         Elf32_Word p_memsz;
         Elf32_Word p_flags;
         Elf32_Word p_align;
+
+        template <ranges::contiguous_range F,
+                  ranges::view T =
+                      decltype(execution_view_inner(
+                          std::declval<const ProgramHeader<X32> *>(),
+                          std::declval<const F &>()))>
+            requires ranges::input_range<T>
+        auto ExecutionView(const F &file) const -> T
+        {
+            return execution_view_inner(this, file);
+        }
     };
 
     template <>
@@ -101,6 +126,17 @@ namespace elf
         Elf64_Xword p_filesz;
         Elf64_Xword p_memsz;
         Elf64_Xword p_align;
+
+        template <ranges::contiguous_range F,
+                  ranges::view T =
+                      decltype(execution_view_inner(
+                          std::declval<const ProgramHeader<X64> *>(),
+                          std::declval<const F &>()))>
+            requires ranges::input_range<T>
+        auto ExecutionView(const F &file) const -> T
+        {
+            return execution_view_inner(this, file);
+        }
     };
 
     template <Width W>

@@ -3,9 +3,11 @@ module;
 #include <ranges>
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 #include <utility>
 #include <stdexcept>
 #include <format>
+#include <vector>
 export module Elf;
 import :Header;
 import :Util;

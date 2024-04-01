@@ -13,6 +13,7 @@ module;
 #include <errno.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
+#include <sys/uio.h>
 #include <signal.h>
 #include <string.h>
 export module Lib;
