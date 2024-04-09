@@ -18,7 +18,7 @@ public:
     IgnoreOut()
     {
     }
-    IgnoreOut &operator<<(auto v)
+    inline const IgnoreOut &operator<<(const auto &v) const noexcept
     {
         return *this;
     }
