@@ -1,7 +1,8 @@
 import Lib;
 
-int main(int argc, char const *argv[])
+int
+main(int argc, char const* argv[])
 {
-    /* code */
-    load_elf(argv[1]);
+  /* code */
+  load_elf(argv[1]);
 }

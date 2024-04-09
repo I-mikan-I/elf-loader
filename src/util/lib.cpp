@@ -15,33 +15,24 @@ export module Util;
 class IgnoreOut
 {
 public:
-    IgnoreOut()
-    {
-    }
-    inline const IgnoreOut &operator<<(const auto &v) const noexcept
-    {
-        return *this;
-    }
+  IgnoreOut() {}
+  inline const IgnoreOut& operator<<(const auto& v) const noexcept { return *this; }
 };
 
 static IgnoreOut ignore_out = IgnoreOut();
 
-template <int LEVEL>
-consteval static auto &getDebug()
+template<int LEVEL>
+consteval static auto&
+getDebug()
 {
-    if constexpr (LEVEL == 1)
-    {
-        return ignore_out;
-    }
-    else if constexpr (LEVEL == 2)
-    {
-        return std::cout;
-    }
-    else
-    {
-        static_assert(false);
-    }
+  if constexpr (LEVEL == 1) {
+    return ignore_out;
+  } else if constexpr (LEVEL == 2) {
+    return std::cout;
+  } else {
+    static_assert(false);
+  }
 }
 
-export auto &info = std::cout;
-export auto &debug = getDebug<LOGLEVEL>();
+export auto& info = std::cout;
+export auto& debug = getDebug<LOGLEVEL>();
